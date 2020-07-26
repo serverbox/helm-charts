@@ -13,9 +13,9 @@ spec:
       {{- include "proftpd.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-    {{- with .Values.podAnnotations }}
       annotations:
         checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum | trunc 63 }}
+    {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
     {{- end }}
       labels:
@@ -57,13 +57,16 @@ spec:
               containerPort: {{ .Values.service.ports.ftpCommand }}
               protocol: TCP
             {{- range until ( add 1 .Values.service.ports.dynamicCount | int ) }}
-            - containerPort: {{ add ( $.Values.service.ports.dynamicStart | int)  . }}
+            - name: passive{{ . }}
+              containerPort: {{ add ( $.Values.service.ports.dynamicStart | int)  . }}
               protocol: TCP
             {{- end }}
           livenessProbe:
+            periodSeconds: 60
             tcpSocket:
               port: ftp
           readinessProbe:
+            periodSeconds: 60
             tcpSocket:
               port: ftp
           resources:
@@ -83,6 +86,9 @@ spec:
             name:       secrets
             readOnly:   true
           {{- end }}
+      {{- with .Values.proftpd.additionalMounts }}
+        {{- toYaml . | nindent 10 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -102,3 +108,6 @@ spec:
         - name: secrets
           secret:
             secretName: {{ include "proftpd.fullname" . }}
+      {{- with .Values.proftpd.additionalVolumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

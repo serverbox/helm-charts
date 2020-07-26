@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: cyberduck/proftpd-mysql
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
@@ -37,13 +37,18 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
+  #type: ClusterIP
   type: NodePort
   ports:
     ftpData:      20
     ftpCommand:   21
     dynamicStart: 38000
-    dynamicCount: 99
+    # K8s has some issues with more than 100 total ports. 
+    # Error updating Endpoint Slices for Service kube-public/proftpd: Error updating proftpd-p8vfc EndpointSlice for Service kube-public/proftpd: EndpointSlice.discovery.k8s.io "proftpd-p8vfc" is invalid: ports: Too many: 101: must have at most 100 items
+    dynamicCount: 95
+  # masqueradeAddress is the public ip address that proftpd presents to the client
   masqueradeAddress: 1.2.3.4
+  externalIPs: []
 
 ingress:
   enabled: false
@@ -119,9 +124,5 @@ proftpd:
     logs:
       login:          false
       modified:       false
-
-  # masqueradeAddress is the public ip address that proftpd presents to the client
-  # masqueradeAddress: 8.8.8.8
-  masqueradeAddress:  false
-
-
+  additionalVolumes:  []
+  additionalMounts:   []

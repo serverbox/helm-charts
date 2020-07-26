@@ -6,6 +6,10 @@ metadata:
     {{- include "proftpd.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
+  {{- with .Values.service.externalIPs }}
+  externalIPs:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   ports:
     {{- if .Values.service.ports.ftpData }}
     - name: ftp-data
@@ -19,8 +23,9 @@ spec:
       name: ftp
     {{- range until ( add 1 .Values.service.ports.dynamicCount | int ) }}
     - port: {{ add ( $.Values.service.ports.dynamicStart | int)  . }}
-      targetPort: {{ add ( $.Values.service.ports.dynamicStart | int)  . }}
+      targetPort: passive{{ . }}
       protocol: TCP
+      name: passive{{ . }}
     {{- end }}
   selector:
     {{- include "proftpd.selectorLabels" . | nindent 4 }}

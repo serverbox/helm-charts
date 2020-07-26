@@ -28,7 +28,10 @@ data:
     <IfModule mod_dynmasq.c>
     # DynMasqRefresh 28800
     </IfModule>
+
   {{- end }}
+    #
+
 
   proftp-conf: |-
   {{- with .Values.proftpd.config }}
@@ -41,6 +44,7 @@ data:
 
     # Normally, we want files to be overwriteable.
     AllowOverwrite      on
+    AllowLogSymlinks    on
     DefaultServer       on
     DeferWelcome        off
     DebugLevel          {{ .debugLevel }}
@@ -107,8 +111,8 @@ data:
     #
     # UseSendFile     off
 
-    TransferLog /dev/fd/2
-    SystemLog   /dev/fd/2
+    TransferLog /dev/stdout
+    SystemLog   /dev/stdout
 
     # Logging onto /var/log/lastlog is enabled but set to off by default
     #UseLastlog on
@@ -139,8 +143,8 @@ data:
     ControlsMaxClients    2
     ControlsLog           /dev/fd/2
     ControlsInterval      5
-    ControlsSocket        /var/run/proftpd/proftpd.sock
-    ScoreboardFile        /var/run/proftpd/proftpd.scoreboard
+    ControlsSocket        /tmp/proftpd.sock
+    #ScoreboardFile        /tmp/proftpd.scoreboard
     </IfModule>
 
     <IfModule mod_ctrls_admin.c>
@@ -157,4 +161,6 @@ data:
 
     # Include other custom configuration files
     Include /etc/proftpd/conf.d/
+
   {{- end }}
+    #
