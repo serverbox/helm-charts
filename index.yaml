@@ -14,6 +14,16 @@ entries:
   sshd:
   - apiVersion: v2
     appVersion: 1.2.1
+    created: "2020-07-26T19:53:34.848776732Z"
+    description: SSH host. Useful for ssh hopping and other port-forwarding
+    digest: 0d38667d7af011f612a098f20d0091b808379ba42097fe15799c8de9428eb1f3
+    name: sshd
+    type: application
+    urls:
+    - https://github.com/timothyclarke/helm-charts/releases/download/sshd-0.1.3/sshd-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v2
+    appVersion: 1.2.1
     created: "2020-07-26T18:53:13.594124313Z"
     description: SSH host. Useful for ssh hopping and other port-forwarding
     digest: e6b27a3c1dd192331eb0be0d4a70726cecd451ddd171c82be302264439c3c9f6
