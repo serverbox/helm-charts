@@ -2,5 +2,5 @@ apiVersion: v2
 name: tinyproxy
 description: Deploys Tinyproxy into the cluster. TinyProxy is a small http(s) proxy
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: 1.2
