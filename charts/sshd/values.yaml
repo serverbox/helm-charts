@@ -88,16 +88,19 @@ ssh:
   passwordEnabled:  false
   sftpChRoot:       '/data'
   tcpForwarding:    true
-  hostkeys: {}
-#    dsa:
-#      private:
-#      public:
-#    ecdsa:
-#      private:
-#      public:
-#    ed25519:
-#      private:
-#      public:
+  hostkeys:
+    dsa:
+      private:      false
+      public        false:
+    ecdsa:
+      private:      false
+      public:       false
+    ed25519:
+      private:      false
+      public:       false
+    rsa:
+      private:      false
+      public        false:
 #    rsa:
 #      private: |-
 #        -----BEGIN OPENSSH PRIVATE KEY-----

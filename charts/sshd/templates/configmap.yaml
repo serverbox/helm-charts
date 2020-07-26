@@ -10,32 +10,3 @@ data:
   user-{{ $user }}-keys: |-
     {{ $args.keys }}
   {{- end }}
-# Host keys
-  {{- if .Values.ssh.hostkeys.dsa.private }}
-  host-key-priv-dsa: |-
-    {{- .Values.ssh.hostkeys.dsa.private | nindent 4 }}
-  {{- end }}
-  {{- if .Values.ssh.hostkeys.dsa.public }}
-  host-key-pub-dsa: {{ .Values.ssh.hostkeys.dsa.public }}
-  {{- end }}
-  {{- if .Values.ssh.hostkeys.ecdsa.private }}
-  host-key-priv-ecdsa: |-
-    {{- .Values.ssh.hostkeys.ecdsa.private | nindent 4 }}
-  {{- end }}
-  {{- if .Values.ssh.hostkeys.ecdsa.public }}
-  host-key-pub-ecdsa: {{ .Values.ssh.hostkeys.ecdsa.public }}
-  {{- end }}
-  {{- if .Values.ssh.hostkeys.ed25519.private }}
-  host-key-priv-ed25519: |-
-    {{- .Values.ssh.hostkeys.ed25519.private | nindent 4 }}
-  {{- end }}
-  {{- if .Values.ssh.hostkeys.ed25519.public }}
-  host-key-pub-ed25519: {{ .Values.ssh.hostkeys.ed25519.public }}
-  {{- end }}
-  {{- if .Values.ssh.hostkeys.rsa.private }}
-  host-key-priv-rsa: |-
-    {{- .Values.ssh.hostkeys.rsa.private | nindent 4 }}
-  {{- end }}
-  {{- if .Values.ssh.hostkeys.rsa.public }}
-  host-key-pub-rsa: {{ .Values.ssh.hostkeys.rsa.public }}
-  {{- end }}
