@@ -86,20 +86,36 @@ spec:
               value: {{ include "sshd.userAccounts" . | quote }}
           volumeMounts:
           {{- if .Values.hostkeys }}
-          - mountPath:  /etc/ssh/keys/ssh_host_rsa_key
-            subPath:    host-key-rsa
+          - mountPath:  /etc/ssh/keys/ssh_host_dsa_key
+            subPath:    host-key-priv-dsa
             name:       config
             readOnly:   true
-          - mountPath:  /etc/ssh/keys/ssh_host_dsa_key
-            subPath:    host-key-dsa
+          - mountPath:  /etc/ssh/keys/ssh_host_dsa_key.pub
+            subPath:    host-key-pub-dsa
             name:       config
             readOnly:   true
           - mountPath:  /etc/ssh/keys/ssh_host_ecdsa_key
-            subPath:    host-key-ecdsa
+            subPath:    host-key-priv-ecdsa
+            name:       config
+            readOnly:   true
+          - mountPath:  /etc/ssh/keys/ssh_host_ecdsa_key.pub
+            subPath:    host-key-pub-ecdsa
             name:       config
             readOnly:   true
           - mountPath:  /etc/ssh/keys/ssh_host_ed25519_key
-            subPath:    host-key-ed25519
+            subPath:    host-key-priv-ed25519
+            name:       config
+            readOnly:   true
+          - mountPath:  /etc/ssh/keys/ssh_host_ed25519_key.pub
+            subPath:    host-key-pub-ed25519
+            name:       config
+            readOnly:   true
+          - mountPath:  /etc/ssh/keys/ssh_host_rsa_key
+            subPath:    host-key-priv-rsa
+            name:       config
+            readOnly:   true
+          - mountPath:  /etc/ssh/keys/ssh_host_rsa_key.pub
+            subPath:    host-key-pub-rsa
             name:       config
             readOnly:   true
           {{- end }}

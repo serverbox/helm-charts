@@ -88,6 +88,26 @@ ssh:
   passwordEnabled:  false
   sftpChRoot:       '/data'
   tcpForwarding:    true
+  hostkeys: {}
+#    dsa:
+#      private:
+#      public:
+#    ecdsa:
+#      private:
+#      public:
+#    ed25519:
+#      private:
+#      public:
+#    rsa:
+#      private: |-
+#        -----BEGIN OPENSSH PRIVATE KEY-----
+#        NhAAAAAwEAAQAAAYEAziQkIFNKrBUp6mzRSFpRGtp80Fy+0VSCBCQap8ozCdiMUxgyE8xz
+#        b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
+#        SNIP
+#        tQhv+7NWO6KzMl/JxnfimIa2RNavy9zRV1IO+C3Qd4oE/MYVKdkZODbi0NGNEGBkiwwKve
+#        y/g+xXrUuCKWMAAAAacm9vdEBzc2hkLTg0ZGM5NGRiZjYtNjRqdzUB
+#        -----END OPENSSH PRIVATE KEY-----
+#      public:
 
 users:
   example-user:
