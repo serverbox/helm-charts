@@ -11,6 +11,17 @@ entries:
     urls:
     - https://github.com/timothyclarke/helm-charts/releases/download/proftpd-0.1.0/proftpd-0.1.0.tgz
     version: 0.1.0
+  sshd:
+  - apiVersion: v2
+    appVersion: 1.2.1
+    created: "2020-07-26T18:17:57.53816157Z"
+    description: SSH host. Useful for ssh hopping and other port-forwarding
+    digest: 24df29ba4bd026874234c06d498d9b3d6798cea01a66b3235802d7b9d25a7698
+    name: sshd
+    type: application
+    urls:
+    - https://github.com/timothyclarke/helm-charts/releases/download/sshd-0.1.0/sshd-0.1.0.tgz
+    version: 0.1.0
   tinyproxy:
   - apiVersion: v2
     appVersion: "1.2"
