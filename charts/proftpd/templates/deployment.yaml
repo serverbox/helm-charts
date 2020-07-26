@@ -34,6 +34,19 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.proftpd.username }}
+          env:
+            - name: FTP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "proftpd.fullname" . }}
+                  key:  ftpUser
+            - name: FTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "proftpd.fullname" . }}
+                  key:  ftpPass
+          {{- end }}
           ports:
             {{- if .Values.service.ports.ftpData }}
             - name: ftp-data
@@ -67,7 +80,7 @@ spec:
           {{- if .Values.proftpd.sql.enabled }}
           - mountPath:  /etc/proftpd/conf.d/sql.conf
             subPath:    sql-conf
-            name:       config
+            name:       secrets
             readOnly:   true
           {{- end }}
       {{- with .Values.nodeSelector }}
@@ -86,3 +99,6 @@ spec:
         - name: config
           configMap:
             name: {{ include "proftpd.fullname" . }}
+        - name: secrets
+          secret:
+            secretName: {{ include "proftpd.fullname" . }}
