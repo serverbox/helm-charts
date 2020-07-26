@@ -1,0 +1,15 @@
+apiVersion: v1
+entries:
+  tinyproxy:
+  - apiVersion: v2
+    appVersion: "1.2"
+    created: "2020-07-26T09:19:51.882720503Z"
+    description: Deploys Tinyproxy into the cluster. TinyProxy is a small http(s)
+      proxy
+    digest: c71329a424defd53b0416cb06876c6cd9d42c3ee4809672e5d03739dafe93ddc
+    name: tinyproxy
+    type: application
+    urls:
+    - https://github.com/timothyclarke/helm-charts/releases/download/tinyproxy-0.1.1/tinyproxy-0.1.1.tgz
+    version: 0.1.1
+generated: "2020-07-26T09:19:51.72550841Z"
