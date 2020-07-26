@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sshd.fullname" . }}
+  labels:
+    {{- include "sshd.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "sshd.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "sshd.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "sshd.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: ssh
+              containerPort: 22
+              protocol: TCP
+          livenessProbe:
+            periodSeconds: 10
+            tcpSocket:
+              port: ssh
+          readinessProbe:
+            periodSeconds: 10
+            tcpSocket:
+              port: ssh
+          env:
+            - name: SSH_ENABLE_ROOT
+          {{- if .Values.ssh.rootEnabled }}
+              value: 'true'
+          {{- else }}
+              value: 'false'
+          {{- end }}
+            - name: SSH_ENABLE_PASSWORD_AUTH
+          {{- if .Values.ssh.passwordEnabled }}
+              value: 'true'
+          {{- else }}
+              value: 'false'
+          {{- end }}
+          {{- if eq .Values.ssh.mode "sftp" }}
+            - name: SFTP_MODE
+              value: 'true'
+            - name: SFTP_CHROOT
+              value: {{ .Values.ssh.sftpChRoot | quote }}
+          {{- else if eq .Values.ssh.mode "scp" }}
+            - name: SCP_MODE
+              value: 'true'
+          {{- else if eq .Values.ssh.mode "rsync" }}
+            - name: RSYNC_MODE
+              value: 'true'
+          {{- end }}
+            - name: GATEWAY_PORTS
+          {{- if .Values.ssh.gatewayPorts }}
+              value: 'true'
+          {{- else }}
+              value: 'false'
+          {{- end }}
+            - name: TCP_FORWARDING
+          {{- if .Values.ssh.tcpForwarding }}
+              value: 'true'
+          {{- else }}
+              value: 'false'
+          {{- end }}
+            - name: SSH_USERS
+              value: {{ include "sshd.userAccounts" . | quote }}
+          volumeMounts:
+          {{- if .Values.hostkeys }}
+          - mountPath:  /etc/ssh/keys/ssh_host_rsa_key
+            subPath:    host-key-rsa
+            name:       config
+            readOnly:   true
+          - mountPath:  /etc/ssh/keys/ssh_host_dsa_key
+            subPath:    host-key-dsa
+            name:       config
+            readOnly:   true
+          - mountPath:  /etc/ssh/keys/ssh_host_ecdsa_key
+            subPath:    host-key-ecdsa
+            name:       config
+            readOnly:   true
+          - mountPath:  /etc/ssh/keys/ssh_host_ed25519_key
+            subPath:    host-key-ed25519
+            name:       config
+            readOnly:   true
+          {{- end }}
+          {{- range $user, $args := .Values.users }}
+          - mountPath:  /home/{{ $user }}/.ssh/authorized_keys
+            subPath:    user-{{ $user }}-keys
+            name:       config
+            readOnly:   true
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "sshd.fullname" . }}
