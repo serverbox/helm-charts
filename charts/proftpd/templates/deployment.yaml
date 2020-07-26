@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "proftpd.fullname" . }}
+  labels:
+    {{- include "proftpd.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "proftpd.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum | trunc 63 }}
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "proftpd.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "proftpd.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            {{- if .Values.service.ports.ftpData }}
+            - name: ftp-data
+              containerPort: {{ .Values.service.ports.ftpData }}
+              protocol: TCP
+            {{- end }}
+            - name: ftp
+              containerPort: {{ .Values.service.ports.ftpCommand }}
+              protocol: TCP
+            {{- range until ( add 1 .Values.service.ports.dynamicCount | int ) }}
+            - containerPort: {{ add ( $.Values.service.ports.dynamicStart | int)  . }}
+              protocol: TCP
+            {{- end }}
+          livenessProbe:
+            tcpSocket:
+              port: ftp
+          readinessProbe:
+            tcpSocket:
+              port: ftp
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath:  /etc/proftpd/proftpd.conf
+            subPath:    proftp-conf
+            name:       config
+            readOnly:   true
+          - mountPath:  /etc/proftpd/conf.d/ports.conf
+            subPath:    ports-conf
+            name:       config
+            readOnly:   true
+          {{- if .Values.proftpd.sql.enabled }}
+          - mountPath:  /etc/proftpd/conf.d/sql.conf
+            subPath:    sql-conf
+            name:       config
+            readOnly:   true
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "proftpd.fullname" . }}

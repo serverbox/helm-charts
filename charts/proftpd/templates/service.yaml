@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "proftpd.fullname" . }}
+  labels:
+    {{- include "proftpd.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    {{- if .Values.service.ports.ftpData }}
+    - name: ftp-data
+      port: {{ .Values.service.ports.ftpData }}
+      targetPort: ftp-data
+      protocol: TCP
+    {{- end }}
+    - port: {{ .Values.service.ports.ftpCommand }}
+      targetPort: ftp
+      protocol: TCP
+      name: ftp
+    {{- range until ( add 1 .Values.service.ports.dynamicCount | int ) }}
+    - port: {{ add ( $.Values.service.ports.dynamicStart | int)  . }}
+      targetPort: {{ add ( $.Values.service.ports.dynamicStart | int)  . }}
+      protocol: TCP
+    {{- end }}
+  selector:
+    {{- include "proftpd.selectorLabels" . | nindent 4 }}
