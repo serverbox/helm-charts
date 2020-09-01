@@ -1,0 +1,158 @@
+# Default values for keycloak-export.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+keycloak:
+  replicas: 1
+
+  image:
+    repository: docker.io/jboss/keycloak
+    # Overrides the image tag whose default is the chart version.
+    tag: ""
+    pullPolicy: IfNotPresent
+
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ##
+    pullSecrets: []
+    # - myRegistrKeySecretName
+
+  export:
+    # When the job should run
+    schedule: '27 1 * * * *'
+    # This is a Java timeout, 30 Seconds is added the shell timeout
+    timeout:  1900
+    path:     '/export'
+    preExportCommand: ''
+    #preExportCommand: '/scripts/customSqlDump.sh'
+    persistence:
+      enabled: false
+      ## If defined, storageClassName: <storageClass>.
+      ## If set to "-", storageClassName: "", which disables dynamic provisioning.
+      ## If undefined (the default) or set to null, no storageClassName spec is
+      ## set, choosing the default provisioner (gp2 on AWS, standard on GKE, AWS, and OpenStack).
+      storageClass: ""
+      size: 10Gi
+      existingClaim: ""
+      annotations: {}
+  shipping:
+    image:
+      repository:   false
+      #repository:   exporter
+      tag:          1.2.3
+      pullPolicy:   IfNotPresent
+    command:  ""
+#    command:  scp_sync.sh
+    scripts: {}
+#      scp_sync.sh: |
+#        #!/usr/bin/env bash
+#        tar -czf keycloak-export-$(date +%F).tar.gz /export/*json
+#        scp /keycloak-export-$(date +%F).tar.gz server:path/keycloak-export-$(date +%F).tar.gz
+#      customSqlDump.sh: |
+#         #!/usr/bin/env bash
+#         for customTable in table1 table2 table3
+#           mysqldump -h ${DB_HOST} > table1.sql
+#         done
+  ## Persistence configuration
+  persistence:
+    # If true, the Postgres chart is deployed
+    deployPostgres: false
+
+    # The database vendor. Can be either "postgres", "mysql", "mariadb", or "h2"
+    dbVendor: h2
+
+    ## The following values only apply if "deployPostgres" is set to "false"
+    dbName: keycloak
+    dbHost: mykeycloak
+    dbPort: 5432
+
+    ## Database Credentials are loaded from a Secret residing in the same Namespace as keycloak.
+    ## The Chart can read credentials from an existing Secret OR it can provision its own Secret.
+
+    ## Specify existing Secret
+    # If set, specifies the Name of an existing Secret to read db credentials from.
+    existingSecret: 'keycloak-http'
+    existingSecretPasswordKey: ""  # read keycloak db password from existingSecret under this Key
+    existingSecretUsernameKey: ""  # read keycloak db user from existingSecret under this Key
+
+    ## Provision new Secret
+    # Only used if existingSecret is not specified. In this case a new secret is created
+    # populated by the variables below.
+    dbUser: keycloak
+    dbPassword: ""
+
+  ## Custom shipping scripts to run after keycloak has finished exporting
+  shippingScripts: {}
+    # mystartup.sh: |
+    #   #!/bin/sh
+    #
+    #   echo 'Hello from my custom startup script!'
+
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

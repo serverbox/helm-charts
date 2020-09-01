@@ -1,0 +1,29 @@
+{{- if and .Values.keycloak.export.persistence.enabled (not .Values.keycloak.export.persistence.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ template "keycloak-export.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+{{- with .Values.keycloak.export.persistence.annotations  }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  labels:
+    app: {{ template "keycloak-export.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  accessModes:
+    - {{ .Values.keycloak.export.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.keycloak.export.persistence.size | quote }}
+{{- if .Values.keycloak.export.persistence.storageClass }}
+{{- if (eq "-" .Values.keycloak.export.persistence.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.keycloak.export.persistence.storageClass }}"
+{{- end }}
+{{- end }}
+{{- end }}

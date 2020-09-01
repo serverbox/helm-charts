@@ -1,0 +1,98 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "keycloak-export.fullname" . }}
+  labels:
+    {{- include "keycloak-export.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.keycloak.export.schedule | quote }}
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 2
+  successfulJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      selector:
+        matchLabels:
+          {{- include "keycloak-export.selectorLabels" . | nindent 10 }}
+      template:
+        metadata:
+        {{- with .Values.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 8 }}
+        {{- end }}
+          labels:
+            {{- include "keycloak-export.selectorLabels" . | nindent 12 }}
+        spec:
+          restartPolicy: OnFailure
+          {{- with .Values.keycloak.image.pullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          serviceAccountName: {{ include "keycloak-export.serviceAccountName" . }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          containers:
+            - name: {{ .Chart.Name }}-exporter
+              command:
+                - /scripts/start_and_export.sh
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              image: "{{ .Values.keycloak.image.repository }}:{{ .Values.keycloak.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.keycloak.image.pullPolicy }}
+              env:
+              {{- include "keycloak-export.dbEnvVars" . | nindent 16 }}
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
+              volumeMounts:
+                - name: sh
+                  mountPath: /scripts
+                  readOnly: true
+                - name: sharedLogs
+                  mountPath: /shared
+                - name: exports
+                  mountPath: {{ .Values.keycloak.export.path }}
+            {{- if .Values.keycloak.shipping.image.repository }}
+            - name: {{ .Chart.Name }}-shipper
+              command:
+                - /scripts/ship_export.sh
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              image: "{{ .Values.keycloak.shipping.image.repository }}:{{ .Values.keycloak.shipping.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.keycloak.shipping.image.pullPolicy }}
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
+              volumeMounts:
+                - name: sh
+                  mountPath: /scripts
+                  readOnly: true
+                - name: sharedLogs
+                  mountPath: /shared
+                - name: exports
+                  mountPath: {{ .Values.keycloak.export.path }}
+            {{- end }}
+          volumes:
+            - name: sh
+              configMap:
+                name: {{ include "keycloak-export.fullname" . }}-sh
+                defaultMode: 0555
+            - name: sharedLogs
+              emptyDir: {}
+            - name: exports
+            {{- if .Values.keycloak.export.persistence.enabled }}
+              persistentVolumeClaim:
+                claimName: {{ .Values.keycloak.export.persistence.existingClaim | default (include "keycloak-export.fullname" .) }}
+            {{- else }}
+              emptyDir: {}
+            {{- end }}
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}

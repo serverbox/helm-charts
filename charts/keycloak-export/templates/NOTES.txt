@@ -1,0 +1,1 @@
+This cronjob should export the keycloak user database then execute a script to copy it elsewhere
