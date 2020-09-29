@@ -1,6 +1,29 @@
 apiVersion: v1
 entries:
+  dr-abc:
+  - apiVersion: v2
+    appVersion: "3.12"
+    created: "2020-09-29T17:34:37.778945319Z"
+    description: 'Done Restarting - All Brokwn Contaners : A K8s App which will check
+      the api for CrashLoopBackOff containers and will delete them'
+    digest: ae6c321400f1d2ecdd5fbcc198b9e60c222e242affc1c23ae482b482a85ebcfd
+    name: dr-abc
+    type: application
+    urls:
+    - https://github.com/timothyclarke/helm-charts/releases/download/dr-abc-0.1.0/dr-abc-0.1.0.tgz
+    version: 0.1.0
   keycloak-export:
+  - apiVersion: v2
+    appVersion: 10.0.0
+    created: "2020-09-29T17:34:37.898322141Z"
+    description: Exports Keycloak Realms for backup and gives the option to run shipping
+      scripts
+    digest: 7fbd67727f55a8a92268169aedbd846085915afcd380ad91d6a0567d3d5b09f3
+    name: keycloak-export
+    type: application
+    urls:
+    - https://github.com/timothyclarke/helm-charts/releases/download/keycloak-export-0.1.1/keycloak-export-0.1.1.tgz
+    version: 0.1.1
   - apiVersion: v2
     appVersion: 10.0.0
     created: "2020-09-01T10:15:29.08084108Z"
