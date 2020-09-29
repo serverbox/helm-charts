@@ -1,6 +1,6 @@
 apiVersion: v2
 name: dr-abc
-description: Done Restarting - All Brokwn Contaners : A K8s App which will check the api for CrashLoopBackOff containers and will delete them
+description: "Done Restarting - All Brokwn Contaners : A K8s App which will check the api for CrashLoopBackOff containers and will delete them"
 
 # A chart can be either an 'application' or a 'library' chart.
 #
