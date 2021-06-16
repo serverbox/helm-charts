@@ -1,0 +1,128 @@
+{{- if .Values.mail.daemonset }}
+apiVersion: apps/v1
+kind: DaemonSet
+{{- else }}
+apiVersion: apps/v1
+kind: Deployment
+{{- end }}
+metadata:
+  name: {{ include "mail-proxy.fullname" . }}
+  labels:
+    {{- include "mail-proxy.labels" . | nindent 4 }}
+spec:
+  {{- if and (not .Values.autoscaling.enabled) (not .Values.mail.daemonset) }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "mail-proxy.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap-nginx.yaml") . | sha256sum | trunc 63 }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mail-proxy.selectorLabels" . | nindent 8 }}
+    spec:
+      hostNetwork: true
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mail-proxy.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- with .Values.mail.all }}
+            {{- if .imap }}
+            - name: imap
+              containerPort: 143
+              hostPort: 143
+              protocol: TCP
+            {{- end }}
+            {{- if .imaps }}
+            - name: imaps
+              containerPort: 995
+              hostPort: 995
+              protocol: TCP
+            {{- end }}
+            {{- if .pop3 }}
+            - name: pop3
+              containerPort: 110
+              hostPort: 110
+              protocol: TCP
+            {{- end }}
+            {{- if .pop3s }}
+            - name: pop3s
+              containerPort: 993
+              hostPort: 993
+              protocol: TCP
+            {{- end }}
+            {{- if .smpts }}
+            - name: smtps
+              containerPort: 587
+              hostPort: 587
+              protocol: TCP
+            {{- end }}
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          volumeMounts:
+          - mountPath:  /etc/nginx/nginx.conf
+            subPath:    nginx.conf
+            name:       config
+            readOnly:   true
+          - mountPath:  /etc/nginx/mail.conf
+            subPath:    mail.conf
+            name:       config
+            readOnly:   true
+          - mountPath:  /etc/nginx/conf.d/default.conf
+            subPath:    default.conf
+            name:       config
+            readOnly:   true
+          - mountPath:  /etc/nginx/ssl
+            name:       secrets
+            readOnly:   true
+          - mountPath:  /usr/share/nginx/html/healthz
+            name:       config
+            subPath:    healthcheck
+            readOnly:   true
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "mail-proxy.fullname" . }}
+        - name: secrets
+          secret:
+            secretName: {{ .Values.mail.hostname }}-tls
+
