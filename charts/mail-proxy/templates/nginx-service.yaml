@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mail-proxy.fullname" . }}-nginx
+  labels:
+    {{- include "mail-proxy.nginxLabels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  {{- with .Values.mail.all }}
+    {{- if .imap }}
+    - name: imap
+      port: {{ add .svcOffset 143 }}
+      targetPort: imap
+      protocol: TCP
+    {{- end }}
+    {{- if .imaps }}
+    - name: imaps
+      port: {{ add .svcOffset 995 }}
+      targetPort: imaps
+      protocol: TCP
+    {{- end }}
+    {{- if .pop3 }}
+    - name: pop3
+      port: {{ add .svcOffset 110 }}
+      targetPort: pop3
+      protocol: TCP
+    {{- end }}
+    {{- if .pop3s }}
+    - name: pop3s
+      port: {{ add .svcOffset 993 }}
+      targetPort: pop3s
+      protocol: TCP
+    {{- end }}
+    {{- if .smpts }}
+    - name: smtps
+      port: {{ add .svcOffset 587 }}
+      targetPort: smtps
+      protocol: TCP
+    {{- end }}
+  {{- end }}
+  selector:
+    {{- include "mail-proxy.nginxSelectorLabels" . | nindent 4 }}
