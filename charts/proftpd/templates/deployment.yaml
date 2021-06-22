@@ -73,16 +73,16 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
           - mountPath:  /etc/proftpd/proftpd.conf
-            subPath:    proftp-conf
+            subPath:    proftp.conf
             name:       config
             readOnly:   true
           - mountPath:  /etc/proftpd/conf.d/ports.conf
-            subPath:    ports-conf
+            subPath:    ports.conf
             name:       config
             readOnly:   true
           {{- if .Values.proftpd.sql.enabled }}
           - mountPath:  /etc/proftpd/conf.d/sql.conf
-            subPath:    sql-conf
+            subPath:    sql.conf
             name:       secrets
             readOnly:   true
           {{- end }}
