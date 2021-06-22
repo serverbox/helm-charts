@@ -1,0 +1,82 @@
+{{- if (eq "svc" .Values.mail.phpAuth.type ) }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mail-proxy.fullname" . }}-php
+  labels:
+    {{- include "mail-proxy.phpLabels" . | nindent 4 }}
+spec:
+  {{- if (not .Values.autoscaling.enabled) }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "mail-proxy.phpSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mail-proxy.phpSelectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mail-proxy.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext.php | nindent 12 }}
+          image: "{{ .Values.image.phpRepo }}:{{ .Values.image.phpTag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: fcgi
+              containerPort: 9000
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+                - /var/www/html/healthcheck/php-fpm-healthcheck
+            periodSeconds:        30
+            failureThreshold:     5
+            initialDelaySeconds:  2
+            successThreshold:     1
+            timeoutSeconds:       5
+          readinessProbe:
+            exec:
+              command:
+                - /var/www/html/healthcheck/php-fpm-healthcheck
+            periodSeconds:        10
+            failureThreshold:     5
+            initialDelaySeconds:  2
+            successThreshold:     1
+            timeoutSeconds:       5
+          volumeMounts:
+          - mountPath:  /config/pgsql.inc
+            subPath:    config.inc
+            name:       config
+            readOnly:   true
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config
+          secret:
+            secretName: {{ include "mail-proxy.fullname" . }}-php
+{{- end }}

@@ -35,7 +35,24 @@ Common labels
 */}}
 {{- define "mail-proxy.labels" -}}
 helm.sh/chart: {{ include "mail-proxy.chart" . }}
-{{ include "mail-proxy.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{- define "mail-proxy.nginxLabels" -}}
+helm.sh/chart: {{ include "mail-proxy.chart" . }}
+{{ include "mail-proxy.nginxSelectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{- define "mail-proxy.phpLabels" -}}
+helm.sh/chart: {{ include "mail-proxy.chart" . }}
+{{ include "mail-proxy.phpSelectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,9 +62,13 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "mail-proxy.selectorLabels" -}}
+{{- define "mail-proxy.nginxSelectorLabels" -}}
 app.kubernetes.io/name: {{ include "mail-proxy.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ .Release.Name }}-nginx
+{{- end }}
+{{- define "mail-proxy.phpSelectorLabels" -}}
+app.kubernetes.io/name: {{ include "mail-proxy.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}-php
 {{- end }}
 
 {{/*

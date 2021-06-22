@@ -9,6 +9,8 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
+  phpRepo:    timothyclarke/php7-fpm-pdo_pgsql
+  phpTag:     0.0.2
 
 imagePullSecrets: []
 nameOverride: ""
@@ -29,15 +31,17 @@ podSecurityContext: {}
   # fsGroup: 2000
 
 securityContext:
-  allowPrivilegeEscalation: true
-  capabilities:
-    #drop:
-    #  - ALL
-    add:
-      - NET_BIND_SERVICE
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+  nginx:
+    allowPrivilegeEscalation: true
+    capabilities:
+      #drop:
+      #  - ALL
+      add:
+        - NET_BIND_SERVICE
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+  php: {}
 
 service:
   type: ClusterIP
@@ -97,9 +101,11 @@ cert:
 #    - localhost.exmample.com
 
 mail:
-  daemonset:       false
+  daemonset:      false
+  customResolv:   true
   hostname:       localhost.example.com
   maxMessageSize: '45485760'
+  scriptName:     '/auth/mailauth.php'
   all:
     svcOffset:    4000
     proxyLBrange: '0.0.0.0/0'
@@ -109,5 +115,16 @@ mail:
     pop3s:        true     # port 995
     smtps:        true     # port 587
   phpAuth:
+    type:   svc  # 'svc' will use the embedded service, otherwise use host and port
     host:   localhost
     port:   '9100'
+  mailhost: email.example.com
+  sql:
+    mode: pgsql
+    host: localhost
+    port: '5432'
+    user: sqlUser
+    pass: sqlPass
+    db:   mail
+    mailServer: localhost
+

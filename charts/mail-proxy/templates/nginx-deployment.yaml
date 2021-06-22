@@ -1,30 +1,29 @@
-{{- if .Values.mail.daemonset }}
 apiVersion: apps/v1
+{{- if .Values.mail.daemonset }}
 kind: DaemonSet
 {{- else }}
-apiVersion: apps/v1
 kind: Deployment
 {{- end }}
 metadata:
-  name: {{ include "mail-proxy.fullname" . }}
+  name: {{ include "mail-proxy.fullname" . }}-nginx
   labels:
-    {{- include "mail-proxy.labels" . | nindent 4 }}
+    {{- include "mail-proxy.nginxLabels" . | nindent 4 }}
 spec:
   {{- if and (not .Values.autoscaling.enabled) (not .Values.mail.daemonset) }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "mail-proxy.selectorLabels" . | nindent 6 }}
+      {{- include "mail-proxy.nginxSelectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
-        checksum/configmap: {{ include (print $.Template.BasePath "/configmap-nginx.yaml") . | sha256sum | trunc 63 }}
+        checksum/configmap: {{ include (print $.Template.BasePath "/nginx-configmap.yaml") . | sha256sum | trunc 63 }}
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "mail-proxy.selectorLabels" . | nindent 8 }}
+        {{- include "mail-proxy.nginxSelectorLabels" . | nindent 8 }}
     spec:
       hostNetwork: true
       {{- with .Values.imagePullSecrets }}
@@ -37,7 +36,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.securityContext.nginx | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -104,6 +103,12 @@ spec:
             name:       config
             subPath:    healthcheck
             readOnly:   true
+          {{- if .Values.mail.customResolv }}
+          - mountPath:  /etc/resolv.conf
+            name:       config
+            subPath:    resolv.conf
+            readOnly:   true
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
@@ -121,7 +126,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ include "mail-proxy.fullname" . }}
+            name: {{ include "mail-proxy.fullname" . }}-nginx
         - name: secrets
           secret:
             secretName: {{ .Values.mail.hostname }}-tls

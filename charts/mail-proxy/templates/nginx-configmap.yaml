@@ -1,7 +1,7 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ include "mail-proxy.fullname" . }}
+  name: {{ include "mail-proxy.fullname" . }}-nginx
   labels:
     {{- include "mail-proxy.labels" . | nindent 4 }}
 data:
@@ -43,7 +43,7 @@ data:
     mail {
       server_name {{  .Values.mail.hostname }};
       # apache external backend
-      auth_http   127.0.0.1:{{ .Values.service.port }}/auth/mailauth.php;
+      auth_http   127.0.0.1:{{ .Values.service.port }}{{ .Values.mail.scriptName }};
       proxy       on;
       proxy_pass_error_message on;
 
@@ -134,7 +134,13 @@ data:
         access_log     /dev/stdout mailAuth;
         include        fastcgi_params;
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_pass   {{ .Values.mail.phpAuth.host }}:{{ .Values.mail.phpAuth.port }};
+        {{- with .Values.mail.phpAuth }}
+        {{- if (eq "svc" .type ) }}
+        fastcgi_pass   {{ include "mail-proxy.fullname" $ }}-php:9000;
+        {{- else }}
+        fastcgi_pass   {{ .host }}:{{ .port }};
+        {{- end }}
+        {{- end }}
         fastcgi_param  SCRIPT_FILENAME  /var/www/html$fastcgi_script_name;
         fastcgi_index  index.php;
       }
@@ -143,3 +149,7 @@ data:
       }
       error_page   500 502 503 504  /50x.html;
     }
+  resolv.conf: |-
+    nameserver 10.96.0.10
+    search {{ .Release.Namespace }}.svc.cluster.local svc.cluster.local cluster.local
+    options ndots:5

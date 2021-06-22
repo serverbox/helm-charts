@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "mail-proxy.fullname" . }}
+  name: {{ include "mail-proxy.fullname" . }}-nginx
   labels:
-    {{- include "mail-proxy.labels" . | nindent 4 }}
+    {{- include "mail-proxy.nginxLabels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -44,4 +44,4 @@ spec:
     {{- end }}
   {{- end }}
   selector:
-    {{- include "mail-proxy.selectorLabels" . | nindent 4 }}
+    {{- include "mail-proxy.nginxSelectorLabels" . | nindent 4 }}
