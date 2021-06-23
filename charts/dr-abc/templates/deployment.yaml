@@ -40,10 +40,10 @@ spec:
           volumeMounts:
           - mountPath:  /usr/local/bin/boot.sh
             name:       configmap
-            subPath:    boot-sh
+            subPath:    boot.sh
           - mountPath:  /usr/local/bin/scraper.py
             name:       configmap
-            subPath:    scraper-py
+            subPath:    scraper.py
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
