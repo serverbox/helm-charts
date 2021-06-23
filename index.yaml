@@ -3,6 +3,17 @@ entries:
   dr-abc:
   - apiVersion: v2
     appVersion: "3.12"
+    created: "2021-06-23T17:04:53.96666388Z"
+    description: 'Done Restarting - All Brokwn Contaners : A K8s App which will check
+      the api for CrashLoopBackOff containers and will delete them'
+    digest: f639a8af3942d3e443aadd838e29d3deac4a46ac5c5e554e7d407de99f3c5093
+    name: dr-abc
+    type: application
+    urls:
+    - https://github.com/timothyclarke/helm-charts/releases/download/dr-abc-0.1.1/dr-abc-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: "3.12"
     created: "2020-09-29T17:34:37.778945319Z"
     description: 'Done Restarting - All Brokwn Contaners : A K8s App which will check
       the api for CrashLoopBackOff containers and will delete them'
@@ -13,6 +24,17 @@ entries:
     - https://github.com/timothyclarke/helm-charts/releases/download/dr-abc-0.1.0/dr-abc-0.1.0.tgz
     version: 0.1.0
   keycloak-export:
+  - apiVersion: v2
+    appVersion: 10.0.0
+    created: "2021-06-23T17:04:54.076478451Z"
+    description: Exports Keycloak Realms for backup and gives the option to run shipping
+      scripts
+    digest: 6127dcccadad4601ed04b274f620d9459e67c5f670a753b25ab8011cdeae7b47
+    name: keycloak-export
+    type: application
+    urls:
+    - https://github.com/timothyclarke/helm-charts/releases/download/keycloak-export-0.1.2/keycloak-export-0.1.2.tgz
+    version: 0.1.2
   - apiVersion: v2
     appVersion: 10.0.0
     created: "2020-09-29T17:34:37.898322141Z"
@@ -38,6 +60,16 @@ entries:
   mail-proxy:
   - apiVersion: v2
     appVersion: 1.21-alpine
+    created: "2021-06-23T17:04:54.183464178Z"
+    description: Deploys nginx as a mail proxy with SSL offload. See https://docs.nginx.com/nginx/admin-guide/mail-proxy/mail-proxy/
+    digest: 6ea4331ad7a8355338295e6619fb61fdac448bc7e1ab53f7ae22735c45df4237
+    name: mail-proxy
+    type: application
+    urls:
+    - https://github.com/timothyclarke/helm-charts/releases/download/mail-proxy-0.1.1/mail-proxy-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.21-alpine
     created: "2021-06-22T18:23:28.304436762Z"
     description: Deploys nginx as a mail proxy with SSL offload. See https://docs.nginx.com/nginx/admin-guide/mail-proxy/mail-proxy/
     digest: 3732d27da5ad2aa4143339a770186e1a9ed44f75f7cc4b15a9edfb94a0ebf45e
@@ -47,6 +79,16 @@ entries:
     - https://github.com/timothyclarke/helm-charts/releases/download/mail-proxy-0.1.0/mail-proxy-0.1.0.tgz
     version: 0.1.0
   proftpd:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2021-06-23T17:04:54.28205408Z"
+    description: Proftpd with SQL Auth & Shared Storage
+    digest: 841d98af199c8ecd0597e1d0a794bc68687ee8f269ab09021afe8aad845f6461
+    name: proftpd
+    type: application
+    urls:
+    - https://github.com/timothyclarke/helm-charts/releases/download/proftpd-0.1.1/proftpd-0.1.1.tgz
+    version: 0.1.1
   - apiVersion: v2
     appVersion: latest
     created: "2020-07-26T15:56:55.011263017Z"
