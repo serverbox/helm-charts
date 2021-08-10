@@ -1,0 +1,3 @@
+Started proxy on port {{ .Values.service.listenPort }}
+Any connection will be forwarded to {{ .Values.service.targetHost }}:{{ .Values.service.targetPort }}
+Please use kubectl port-forward $(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "socat.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}") <local-port>:{{ .Values.service.listenPort }}
