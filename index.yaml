@@ -110,6 +110,17 @@ entries:
     urls:
     - https://github.com/timothyclarke/helm-charts/releases/download/proftpd-0.1.0/proftpd-0.1.0.tgz
     version: 0.1.0
+  socat:
+  - apiVersion: v2
+    appVersion: "3"
+    created: "2021-08-10T11:00:03.879635974Z"
+    description: A socat container to proxy through a k8s cluster, eg to a mysql db
+    digest: c82e2627e3437963ceb7d98b6b529fe94bfb6dd11fb5b8d532d18e198481a68f
+    name: socat
+    type: application
+    urls:
+    - https://github.com/timothyclarke/helm-charts/releases/download/socat-0.1.0/socat-0.1.0.tgz
+    version: 0.1.0
   sshd:
   - apiVersion: v2
     appVersion: 1.2.1
