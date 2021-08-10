@@ -55,3 +55,7 @@ affinity: {}
 #        - matchExpressions:
 #          - key: node-role.kubernetes.io/spot-worker
 #            operator: Exists
+#        - matchExpressions:
+#          - key: eks.amazonaws.com/capacityType
+#            operator: Equals
+#            value: SPOT
