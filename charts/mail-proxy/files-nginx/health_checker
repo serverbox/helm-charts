@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Check the webserver
+curl -s -o /dev/null --resolve {{ .Values.mail.hostname }}:{{ .Values.service.sslport }}:127.0.0.1 https://{{ .Values.mail.hostname }}:{{ .Values.service.sslport }}/healthz
+EXIT_CODE=$?
+
+if test $EXIT_CODE -eq 0
+then
+  echo "Nginx is up and Cert is ok"
+  exit 0
+else
+  echo "Nginx is not up or Cert is faulty"
+  nginx -s reload
+  sleep 2s
+  exit 1
+fi

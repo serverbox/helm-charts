@@ -43,6 +43,9 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+            - name: https
+              containerPort: {{ .Values.service.sslport }}
+              protocol: TCP
           {{- with .Values.mail.all }}
             {{- if .imap }}
             - name: imap
@@ -78,11 +81,15 @@ spec:
           livenessProbe:
             httpGet:
               path: /healthz
-              port: http
+              port: https
+              scheme: HTTPS
           readinessProbe:
-            httpGet:
-              path: /healthz
-              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            exec:
+              command:
+                - /usr/local/bin/health_checker
           volumeMounts:
           - mountPath:  /etc/nginx/nginx.conf
             subPath:    nginx.conf
@@ -96,12 +103,20 @@ spec:
             subPath:    default.conf
             name:       config
             readOnly:   true
+          - mountPath:  /etc/nginx/conf.d/ssl.conf
+            subPath:    ssl.conf
+            name:       config
+            readOnly:   true
           - mountPath:  /etc/nginx/ssl
             name:       secrets
             readOnly:   true
           - mountPath:  /usr/share/nginx/html/healthz
             name:       config
             subPath:    healthcheck
+            readOnly:   true
+          - mountPath:  /usr/local/bin/health_checker
+            name:       config
+            subPath:    health_checker
             readOnly:   true
           {{- if .Values.mail.customResolv }}
           - mountPath:  /etc/resolv.conf
@@ -127,6 +142,7 @@ spec:
         - name: config
           configMap:
             name: {{ include "mail-proxy.fullname" . }}-nginx
+            defaultMode: 0555
         - name: secrets
           secret:
             secretName: {{ .Values.mail.hostname }}-tls

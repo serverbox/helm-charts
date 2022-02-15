@@ -45,8 +45,8 @@ securityContext:
 
 service:
   type: ClusterIP
-  port: 8099
-
+  port:     8099
+  sslport:  8493
 
 ingress:
   enabled: false
