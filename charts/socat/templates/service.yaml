@@ -1,0 +1,17 @@
+{{- if .Values.service.create -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "socat.fullname" . }}
+  labels:
+    {{- include "socat.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: tcp-port
+      protocol: TCP
+      name: tcp-port
+  selector:
+    {{- include "socat.selectorLabels" . | nindent 4 }}
+  {{- end }}
