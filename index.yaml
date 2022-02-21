@@ -123,6 +123,16 @@ entries:
   socat:
   - apiVersion: v2
     appVersion: "3"
+    created: "2022-02-21T19:21:25.723390802Z"
+    description: A socat container to proxy through a k8s cluster, eg to a mysql db
+    digest: 524bc3431d9b9266bce0a9d75a334a4be66a0ba5cabe9a69116a3a39aaef5427
+    name: socat
+    type: application
+    urls:
+    - https://github.com/serverbox/helm-charts/releases/download/socat-0.1.1/socat-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: "3"
     created: "2021-08-10T11:00:03.879635974Z"
     description: A socat container to proxy through a k8s cluster, eg to a mysql db
     digest: c82e2627e3437963ceb7d98b6b529fe94bfb6dd11fb5b8d532d18e198481a68f
