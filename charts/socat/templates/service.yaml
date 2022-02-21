@@ -8,7 +8,7 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
+    - port: {{ .Values.service.listenPort }}
       targetPort: tcp-port
       protocol: TCP
       name: tcp-port
