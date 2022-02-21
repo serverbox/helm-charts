@@ -35,6 +35,7 @@ service:
   listenPort: 3306
   targetPort: 3306
   targetHost: dbserver
+  create:     false
 
 resources:
   limits:
