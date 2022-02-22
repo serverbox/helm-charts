@@ -42,6 +42,12 @@ spec:
       targetPort: smtps
       protocol: TCP
     {{- end }}
+    {{- if .internalSmtp }}
+    - name: altsmtp
+      port: {{ add .svcOffset 25 }}
+      targetPort: altsmtp
+      protocol: TCP
+    {{- end }}
   {{- end }}
   selector:
     {{- include "mail-proxy.nginxSelectorLabels" . | nindent 4 }}
