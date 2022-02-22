@@ -1,0 +1,23 @@
+{{- if .Values.mail.all.internalSmtp }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mail-proxy.fullname" . }}
+  labels:
+    {{- include "mail-proxy.nginxLabels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  {{- with .Values.mail.all }}
+    - name: altsmtp
+      port: {{ add .svcOffset 25 }}
+      targetPort: altsmtp
+      protocol: TCP
+  {{- end }}
+  selector:
+    {{- include "mail-proxy.nginxSelectorLabels" . | nindent 4 }}
+{{- end }}

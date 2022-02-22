@@ -114,6 +114,7 @@ mail:
     pop3:         false    # port 110
     pop3s:        true     # port 995
     smtps:        true     # port 587
+    internalSmtp: noauth   # port 25 + svcOffset
   phpAuth:
     type:   svc  # 'svc' will use the embedded service, otherwise use host and port
     host:   localhost

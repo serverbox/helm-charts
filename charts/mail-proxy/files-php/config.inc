@@ -15,6 +15,6 @@ $sqlConf->user      = {{ .user | quote }};
 // password for the PostgreSQL database
 $sqlConf->password  = {{ .pass | quote }};
 
-$mail_server_ip     = {{ .mailServer | quote }};
+$mail_server_ip     = {{ $.Values.mail.mailhost | quote }};
 ?>
 {{- end }}

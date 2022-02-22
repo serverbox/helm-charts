@@ -18,7 +18,6 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configmap: {{ include (print $.Template.BasePath "/nginx-configmap.yaml") . | sha256sum | trunc 63 }}
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -75,6 +74,12 @@ spec:
             - name: smtps
               containerPort: 587
               hostPort: 587
+              protocol: TCP
+            {{- end }}
+            {{- if .internalSmtp }}
+            - name: altsmtp
+              containerPort: {{ add .svcOffset 25 }}
+              hostPort: {{ add .svcOffset 25 }}
               protocol: TCP
             {{- end }}
           {{- end }}
