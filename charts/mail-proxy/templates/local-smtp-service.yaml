@@ -13,6 +13,10 @@ spec:
       protocol: TCP
       name: http
   {{- with .Values.mail.all }}
+    - name: smtp
+      port: 25
+      targetPort: altsmtp
+      protocol: TCP
     - name: altsmtp
       port: {{ add .svcOffset 25 }}
       targetPort: altsmtp
