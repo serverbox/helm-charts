@@ -71,6 +71,16 @@ entries:
   mail-proxy:
   - apiVersion: v2
     appVersion: 1.21-alpine
+    created: "2022-02-22T11:28:43.507674629Z"
+    description: Deploys nginx as a mail proxy with SSL offload. See https://docs.nginx.com/nginx/admin-guide/mail-proxy/mail-proxy/
+    digest: 1288056e0e19c220b3a9883b71a4ae880d5727f128ee29013ad4325293eceb36
+    name: mail-proxy
+    type: application
+    urls:
+    - https://github.com/serverbox/helm-charts/releases/download/mail-proxy-0.2.1/mail-proxy-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v2
+    appVersion: 1.21-alpine
     created: "2022-02-22T11:19:10.071279819Z"
     description: Deploys nginx as a mail proxy with SSL offload. See https://docs.nginx.com/nginx/admin-guide/mail-proxy/mail-proxy/
     digest: 3235070567c13741ac6d2d728b5d4ec981651359cc9914ee0d706bead29afa1f
